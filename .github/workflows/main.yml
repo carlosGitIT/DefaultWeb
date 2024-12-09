@@ -21,8 +21,8 @@ jobs:
 
       - name: Revert build.ctl to match master
         run: |
-          git checkout main 
-          git pull origin main 
+          git checkout master 
+          git pull origin master 
           git chechout HEAD~1 -- build.ctl
           git commit -m "Revert build.ctl to match master"
-          git push origin main
+          git push origin master
