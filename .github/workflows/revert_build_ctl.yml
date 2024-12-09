@@ -1,0 +1,24 @@
+on:
+  pull_ request:
+    branches:
+      - master
+
+jobs:
+  revert-config:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Git
+        run: |
+          git config --global user name 'github-actions [bot]'
+          git config --global user. email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Revert build.ctl to match master
+        run: |
+          git checkout origin/master -- build.ctl
+          git commit -m "Revert build.ctl to match master"
+          git push origin HEAD:${{ github.head_ref }}
+        
