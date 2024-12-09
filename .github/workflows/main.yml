@@ -23,6 +23,6 @@ jobs:
         run: |
           git checkout master 
           git pull origin master 
-          git chechout HEAD~1 -- build.ctl
+          git checkout HEAD~1 -- build.ctl
           git commit -m "Revert build.ctl to match master"
           git push origin master
