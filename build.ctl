@@ -7,3 +7,4 @@ new_line_2.sql
 line_extra.txt
 new_line_test.sql
 dos.ctl
+data_extra.err
