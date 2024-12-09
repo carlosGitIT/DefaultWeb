@@ -16,11 +16,14 @@ jobs:
 
       - name: Set up Git
         run: |
-          git config user.name "github-actions [bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github actions"
+          git config user.email "actions@github.com"
 
       - name: Revert build.ctl to match master
         run: |
-          git checkout origin/master -- build.ctl
+          git checkout master 
+          git pull origin master 
+          git chechout HEAD~1 -- build.ctl
           git commit -m "Revert build.ctl to match master"
+          git push origin master
           git push origin HEAD:${{ github.head_ref }}
