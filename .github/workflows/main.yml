@@ -5,41 +5,30 @@ on:
     types:
       - opened
       - synchronize
+      - reopened
 
 jobs:
-  revert-file:
+  merge_and_revert:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout the pull request branch
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          ref: ${{ github.head_ref }}
 
-      - name: Set up Git
+      - name: merge pr into master
         run: |
-          git config user.name "github actions"
-          git config user.email "actions@github.com"
-
-      - name: checko if buil.ctl was modified in the PR
-        id: check-file
-        run: |
-          BASE_BRANCH="origin/master"
-
           git fetch origin
-          
-          DIFF_FILES=$(git diff --name-only $BASE_BRANCH...HEAD)
-          
-          if echo "$DIFF_FILES" | grep -q "^build.ctl$"; then
-            echo "modified=true"   >> $GITHUB_ENV
-          else
-            echo "modified=false"  >> $GITHUB_ENV
-          fi
+          git checkout master
+          git merge --no-ff ${{ github.head_ref }}
 
-      - name: Revert build.ctl tif modified
-        if: env.modified == 'true'
+      - name: revert built.ctl to master version
         run: |
-          git checkout $BASE_BRANCH -- build.ctl
+          git checkout origin/master -- build.ctl
           git add build.ctl
-          git commit -m "Revert build.ctl to match master"
-          git push origin HEAD
+          git commit -m "Revert build.ctl to match master version after merge"
+
+      - name: push changes to master
+        run: |
+          git push origin master
