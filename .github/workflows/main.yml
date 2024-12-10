@@ -2,12 +2,12 @@ name: Revert buil.ctl before merging to maser
 
 on:
   pull_request:
-    types: [opened, synchronized, reopened]
+    branches:
+      - master
 
 jobs:
-  protect_build_ctl:
+  revert_file:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout the pull request branch
       uses: actions/checkout@v3
@@ -20,20 +20,23 @@ jobs:
         git config user.name "git hub actions"
         git config user.email "actions@github.com"
 
-    - name: fetch all branches
+    - name: Force replace build.ctl
       run: |
+        echo "Forcing replpacement of build.ctl"
         git fetch origin
-
-    - name: replace build.ctl with master version
-      run: |
-        echo "forcing replacement of build.ctl with master version"
+        git checkout master
         git checkout origin/master -- build.ctl
         git add build.ctl
-        git commit --allow-empty -m "Force replacement"
-        git push origin HEAD:${{ github.head_ref }}
+        git commit -m "force replacement "
+        git push origin master
 
-    - name: merge branch into master
+    - name: merge pull request branch
       run: |
+        echo "mergin pull request branch"
+        git fetch origin
         git checkout master
-        git merge --no-ff origin/${{ github.head_ref}} -m "merge branch into master"
+        git merge --no-ff origin/${{ github.head_ref }}
+
+    - name: push final merge to master
+      run:
         git push origin master
