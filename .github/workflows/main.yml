@@ -35,7 +35,7 @@ jobs:
         shell: bash
 
       - name: Revert build.ctl tif modified
-        if: env.modified == 'true'
+        if: env.modified == 'false'
         run: |
           git checkout $BASE_BRANCH -- build.ctl
           git commit -m "Revert build.ctl to match master"
