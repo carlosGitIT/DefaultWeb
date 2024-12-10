@@ -24,8 +24,7 @@ jobs:
 
       - name: fetch origin master
         run: |
-          git feetch origin master
-          
+          git fetch origin master
 
       - name: check if build.ctl has changes
         run: |
