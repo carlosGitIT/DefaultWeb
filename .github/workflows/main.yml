@@ -15,21 +15,28 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          ref: master
 
       - name: Set up Git
         run: |
           git config user.name "github actions"
           git config user.email "actions@github.com"
 
+      - name: fetch all remote branches
+        run: |
+          git fetch origin
+        
       - name: checko if buil.ctl was modified in the PR
         id: check-file
         run: |
-          git diff --name-only origin/master HEAD | grep -q "^build.ctl$" && echo "modified=true" || echo "modified=false"
+          BASE_BRANCH="origin/master"
+          
+          git diff --name-only $BASE_BRANCH...HEAD | grep -q "^build.ctl$" && echo "modified=true" || echo "modified=false"
+          echo "modified=$(grep -q "^build.ctl$" && echo true || echo false)" >> $GITHUB_ENV
         shell: bash
 
-      - name: Revert build.ctl to match master
+      - name: Revert build.ctl tif modified
+        if: env.modified == 'true'
         run: |
-          git checkout origin/master -- build.ctl
+          git checkout $BASE_BRANCH -- build.ctl
           git commit -m "Revert build.ctl to match master"
           git push origin HEAD
