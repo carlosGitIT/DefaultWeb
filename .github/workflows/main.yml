@@ -12,7 +12,7 @@ jobs:
     - name: Checkout the pull request branch
       uses: actions/checkout@v3
       with:
-        ref: ${{ github.head_ref }}
+        fetch-depth: 0
 
     - name: set up git identity
       run: |
@@ -23,36 +23,16 @@ jobs:
       run: |
         git fetch origin master
 
-
-    - name: checkout if build.ctl has changes
-      id: check-file
+    - name: replace build.ctl with master version
       run: |
-        if git diff --name-only origin/master HEAD | grep -q "^build.ctl$"; then
-          echo "build_ctl_changed=true" >> $GITHUB_ENV
-        else
-          echo "build_ctl_changed=false" >> $GITHUB_ENV
-        fi
-
-    - name: revert build.ctl to match master
-      if: env.build_ctl_changed == 'true'
-      run: |
-        echo "Reverting build.ctl to master version"
+        echo "forcing replacement of build.ctl with master version"
         git checkout origin/master -- build.ctl
         git add build.ctl
-        git commit -m "Revert build.ctl"
+        git commit -m "Force replacement"
         git push origin ${{ github.head_ref }}
 
     - name: merge branch into master
       run: |
         git checkout master
         git merge --no-ff ${{ github.head_ref}} -m "merge branch into master"
-        git push origin master
-        
-    - name: merge pr into master
-      run: |
-        git checkout master
-        git merge --no-ff ${{ github.head_ref }} --allow-unrelated-histories
-
-    - name: push changes to master
-      run: |
         git push origin master
