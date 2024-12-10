@@ -2,7 +2,8 @@ name: Preserve build.ctl after PM merge
 
 on:
   pull_request:
-    types: [close]
+    types:
+      - closed
 
 jobs:
   preserve-build-ctl:
