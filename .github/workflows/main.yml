@@ -19,17 +19,17 @@ jobs:
         git config user.name "git hub actions"
         git config user.email "actions@github.com"
 
-    - name: fetch origin master
+    - name: fetch all branches
       run: |
-        git fetch origin master
+        git fetch origin
 
     - name: replace build.ctl with master version
       run: |
         echo "forcing replacement of build.ctl with master version"
         git checkout origin/master -- build.ctl
         git add build.ctl
-        git commit -m "Force replacement"
-        git push origin ${{ github.head_ref }}
+        git commit --allow-empty -m "Force replacement"
+        git push origin HEAD:${{ github.head_ref }}
 
     - name: merge branch into master
       run: |
