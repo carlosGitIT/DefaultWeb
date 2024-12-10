@@ -38,7 +38,7 @@ jobs:
 
       - name: merge pr into master
         run: |
-          git checkout master -- build.ctl
+          git checkout master
           git merge --no-ff ${{ github.head_ref }}
 
       - name: push changes to master
