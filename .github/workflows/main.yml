@@ -21,22 +21,25 @@ jobs:
           git config user.name "github actions"
           git config user.email "actions@github.com"
 
-      - name: fetch all remote branches
-        run: |
-          git fetch origin
-        
       - name: checko if buil.ctl was modified in the PR
         id: check-file
         run: |
           BASE_BRANCH="origin/master"
+
+          git fetch origin
           
-          git diff --name-only $BASE_BRANCH...HEAD | grep -q "^build.ctl$" && echo "modified=true" || echo "modified=false"
-          echo "modified=$(grep -q "^build.ctl$" && echo true || echo false)" >> $GITHUB_ENV
-        shell: bash
+          DIFF_FILES=$(git diff --name-only $BASE_BRANCH...HEAD)
+          
+          if echo "$DIFF_FILES" | grep -q "^build.ctl$"; then
+            echo "modified=true"   >> $GITHUB_ENV
+          else
+            echo "modified=false"  >> $GITHUB_ENV
+          fi
 
       - name: Revert build.ctl tif modified
-        if: env.modified == 'false'
+        if: env.modified == 'true'
         run: |
           git checkout $BASE_BRANCH -- build.ctl
+          git add build.ctl
           git commit -m "Revert build.ctl to match master"
           git push origin HEAD
