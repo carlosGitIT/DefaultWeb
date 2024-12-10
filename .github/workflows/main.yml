@@ -19,10 +19,17 @@ jobs:
           git config user.name "github actions"
           git config user.email "actions@github.com"
 
-      - name: Revert build.ctl to match master
+      - name: checko if buil.ctl was modified in the PR
+        id: check-file
         run: |
-          git checkout master 
-          git pull origin master 
-          git checkout HEAD -- build.ctl
+          git checkout master
+          git pull origin master
+          git diff --name-only HEAD~1 HEAD | grep -q "^build.ctl$" && echo "modified=true" || echo "modified=false"
+        shell: bash
+
+      - name: Revert build.ctl to match master
+        if: steps.check-file.outputs.modified == 'true'
+        run: |
+          git checkout origin/master -- build.ctl
           git commit -m "Revert build.ctl to match master"
           git push origin master
