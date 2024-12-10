@@ -3,11 +3,11 @@ name: revert build.ctl file
 on:
   pull_request:
     types:
-      - closed
+      - opened
+      - synchronize
 
 jobs:
   revert-file:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
@@ -22,9 +22,7 @@ jobs:
       - name: checko if buil.ctl was modified in the PR
         id: check-file
         run: |
-          git checkout master
-          git pull origin master
-          git diff --name-only HEAD | grep -q "^build.ctl$" && echo "modified=true" || echo "modified=false"
+          git diff --name-only origin/master HEAD | grep -q "^build.ctl$" && echo "modified=true" || echo "modified=false"
         shell: bash
 
       - name: Revert build.ctl to match master
@@ -32,4 +30,4 @@ jobs:
         run: |
           git checkout origin/master -- build.ctl
           git commit -m "Revert build.ctl to match master"
-          git push origin master
+          git push origin HEAD
