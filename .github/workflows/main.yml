@@ -8,7 +8,7 @@ on:
       - reopened
 
 jobs:
-  merge_and_revert:
+  revert_and_merge:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,17 +22,23 @@ jobs:
           git config user.name "github actions"
           git config user.email "actions@github.com"
 
+      - name: check if xtl file has changed in the PR branch
+        run: |
+          git fetch origin master
+          git diff --exit-code origin/master -- build.ctl || echo "build.ctl has changes, reverting ..."
+
+      - name: revert built.ctl to match master version
+        run: |
+          git fetch origin master
+          git checkout origin/master -- build.ctl
+          git add build.ctl
+          git commit -m "Revert build.ctl to match master version after merge"
+
       - name: merge pr into master
         run: |
           git fetch origin
           git checkout master
-          git merge --no-ff ${{ github.head_ref }}
-
-      - name: revert built.ctl to master version
-        run: |
-          git checkout origin/master -- build.ctl
-          git add build.ctl
-          git commit -m "Revert build.ctl to match master version after merge"
+          git merge --no.ff ${{ github.head_ref }}
 
       - name: push changes to master
         run: |
