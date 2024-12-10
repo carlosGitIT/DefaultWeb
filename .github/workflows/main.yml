@@ -29,7 +29,6 @@ jobs:
         shell: bash
 
       - name: Revert build.ctl to match master
-        if: steps.check-file.outputs.modified == 'true'
         run: |
           git checkout origin/master -- build.ctl
           git commit -m "Revert build.ctl to match master"
