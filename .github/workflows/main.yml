@@ -39,7 +39,7 @@ jobs:
       - name: merge pr into master
         run: |
           git checkout master
-          git merge --no-ff ${{ github.head_ref }}
+          git merge --no-ff ${{ github.head_ref }}  --allow-unrelated-histories
 
       - name: push changes to master
         run: |
