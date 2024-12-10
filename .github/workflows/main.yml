@@ -1,4 +1,4 @@
-name: revert build.ctl file
+name: revert build.ctl file before merging to master
 
 on:
   pull_request:
@@ -22,23 +22,25 @@ jobs:
           git config user.name "github actions"
           git config user.email "actions@github.com"
 
-      - name: check if xtl file has changed in the PR branch
+      - name: fetch origin master
         run: |
-          git fetch origin master
-          git diff --exit-code origin/master -- build.ctl || echo "build.ctl has changes, reverting ..."
+          git feetch origin master
+          
 
-      - name: revert built.ctl to match master version
+      - name: check if build.ctl has changes
         run: |
-          git fetch origin master
+          git diff --exit-code origin/master -- build.ctl || echo "build.ctl has changes"
+
+      - name: Revert build.ctl to match master version
+        run: |
           git checkout origin/master -- build.ctl
-          git add build.ctl
-          git commit -m "Revert build.ctl to match master version after merge"
+
+          git diff --exit-code || git commit -m "Revert build.ctl to master version before merge"
 
       - name: merge pr into master
         run: |
-          git fetch origin
-          git checkout master
-          git merge --no.ff ${{ github.head_ref }}
+          git checkout master -- build.ctl
+          git merge --no-ff ${{ github.head_ref }}
 
       - name: push changes to master
         run: |
