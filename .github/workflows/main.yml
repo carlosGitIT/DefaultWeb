@@ -35,5 +35,5 @@ jobs:
     - name: merge branch into master
       run: |
         git checkout master
-        git merge --no-ff ${{ github.head_ref}} -m "merge branch into master"
+        git merge --no-ff origin/${{ github.head_ref}} -m "merge branch into master"
         git push origin master
