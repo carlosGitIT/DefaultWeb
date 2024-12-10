@@ -12,7 +12,8 @@ jobs:
     - name: Checkout the pull request branch
       uses: actions/checkout@v3
       with:
-        ref: ${{ github.head_ref }}
+        fetch-depth: 0
+        #ref: ${{ github.head_ref }}
 
     - name: set up git identity
       run: |
@@ -23,28 +24,16 @@ jobs:
       run: |
         git fetch origin master
 
-
     - name: checkout if build.ctl has changes
       run: |
-        git diff --exit-code origin/master -- build.ctl || echo "build.ctl has changes"
-
-    - name: revert build.ctl to match master
-      run: |
-        git checkout origin/master -- build.ctl
-
-        git diff --exit-code || git commit -m "Revert build.ctl before merge"
-
-    - name: fetch master branch from remote
-      run: |
-        git fetch origin master
         git checkout master
-        git reset --hard origin/master
+        git merge --no-ff ${{ github.head_ref }} --allow-unrelated-histories || true
 
-    - name: merge pr into master
+    - name: resolve conflicts
+      if: failure()
       run: |
-        git checkout master
-        git merge --no-ff ${{ github.head_ref }} --allow-unrelated-histories
+        git checkout --ours build.ctl
+        git add build.ctl
+        git commit -m "Resolve conflicts"
 
-    - name: push changes to master
-      run: |
         git push origin master
