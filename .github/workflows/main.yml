@@ -2,6 +2,7 @@ name: Revert buil.ctl before merging to maser
 
 on:
   pull_request:
+    types: [opened, synchronize]
     branches:
       - master
 
