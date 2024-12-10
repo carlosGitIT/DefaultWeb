@@ -1,45 +1,50 @@
-name: revert build.ctl file
+name: Revert buil.ctl before merging to maser
 
 on:
   pull_request:
-    types:
-      - opened
-      - synchronize
+    types: [opened, synchronized, reopened]
 
 jobs:
-  revert-file:
+  revert_and_merge:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+    - name: Checkout the pull request branch
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.head_ref }}
 
-      - name: Set up Git
-        run: |
-          git config user.name "github actions"
-          git config user.email "actions@github.com"
+    - name: set up git identity
+      run: |
+        git config user.name "git hub actions"
+        git config user.email "actions@github.com"
 
-      - name: checko if buil.ctl was modified in the PR
-        id: check-file
-        run: |
-          BASE_BRANCH="origin/master"
+    - name: fetch origin master
+      run: |
+        git fetch origin master
 
-          git fetch origin
-          
-          DIFF_FILES=$(git diff --name-only $BASE_BRANCH...HEAD)
-          
-          if echo "$DIFF_FILES" | grep -q "^build.ctl$"; then
-            echo "modified=true"   >> $GITHUB_ENV
-          else
-            echo "modified=false"  >> $GITHUB_ENV
-          fi
 
-      - name: Revert build.ctl tif modified
-        if: env.modified == 'true'
-        run: |
-          git checkout $BASE_BRANCH -- build.ctl
-          git add build.ctl
-          git commit -m "Revert build.ctl to match master"
-          git push origin HEAD
+    - name: checkout if build.ctl has changes
+      run: |
+        git diff --exit-code origin/master -- build.ctl || echo "build.ctl has changes"
+
+    - name: revert build.ctl to match master
+      run: |
+        git checkout origin/master -- build.ctl
+
+        git diff --exit-code || git commit -m "Revert build.ctl before merge"
+
+    - name: fetch master branch from remote
+      run: |
+        git fetch origin master
+        git checkout master
+        git reset --hard origin/master
+
+    - name: merge pr into master
+      run: |
+        git checkout master
+        git merge --no-ff ${{ github.head_ref }} --allow-unrelated-histories
+
+    - name: push changes to master
+      run: |
+        git push origin master
