@@ -39,7 +39,7 @@ git checkout $PREVIOUS_COMMIT -- $FILE_TO_REVERT || { echo "Error: No se pudo re
 
 # 6. Verificar si realmente hubo cambios en el archivo
 echo "6. Verificando si realmente hubo cambios en el archivo restaurado..."
-if git diff --staged $FILE_TO_REVERT; then
+if ! git diff --cached $FILE_TO_REVERT; then
   echo "No se detectaron cambios en '$FILE_TO_REVERT' después de la restauración. No se realizará commit."
   exit 0
 fi
