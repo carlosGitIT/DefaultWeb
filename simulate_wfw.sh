@@ -13,6 +13,8 @@ if ! git status &>/dev/null; then
   exit 1
 fi
 
+BRANCH_MASTER=$(git rev-parse --abbrev-ref HEAD)
+
 # 2. Cambiar a la rama master
 echo "2. Cambiando a la rama '$BRANCH_MASTER'..."
 git checkout $BRANCH_MASTER || { echo "Error: No se pudo cambiar a la rama '$BRANCH_MASTER'."; exit 1; }
