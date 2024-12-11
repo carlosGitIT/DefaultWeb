@@ -18,7 +18,7 @@ git checkout $BRANCH_MASTER || { echo "Error: No se pudo cambiar a la rama '$BRA
 
 # 3. Obtener el commit previo al actual en master
 echo "3. Obteniendo el commit anterior en '$BRANCH_MASTER'..."
-PREVIOUS_COMMIT=$(git log --format="%H" -n 2 | tail -n 1)
+PREVIOUS_COMMIT=$(git rev-parse HEAD^)
 if [ -z "$PREVIOUS_COMMIT" ]; then
   echo "Error: No se pudo obtener el commit anterior."
   exit 1
@@ -27,13 +27,16 @@ echo "Commit anterior encontrado: $PREVIOUS_COMMIT"
 
 # 4. Restaurar el archivo build.ctl a su versión del commit anterior
 echo "4. Restaurando el archivo '$FILE_TO_REVERT'..."
-git checkout $PREVIOUS_COMMIT -- $FILE_TO_REVERT || { echo "Error: No se pudo restaurar el archivo '$FILE_TO_REVERT'."; exit 1; }
+git show "$PREVIOUS_COMMIT:$FILE_TO_REVERT" > $FILE_TO_REVERT || { 
+  echo "Error: No se pudo restaurar el archivo '$FILE_TO_REVERT'.";
+  exit 1;
+}
 
 # 5. Verificar si hay cambios
 echo "5. Verificando si el archivo '$FILE_TO_REVERT' tiene cambios..."
-#if git diff --quiet $FILE_TO_REVERT; then
-#  echo "No se detectaron cambios en '$FILE_TO_REVERT'. No se realizará commit."
-#else
+if git diff --staged --quiet $FILE_TO_REVERT; then
+  echo "No se detectaron cambios en '$FILE_TO_REVERT'. No se realizará commit."
+else
   # 6. Hacer commit de los cambios restaurados
   echo "6. Haciendo commit de los cambios restaurados en '$FILE_TO_REVERT'..."
   git add $FILE_TO_REVERT
@@ -43,6 +46,6 @@ echo "5. Verificando si el archivo '$FILE_TO_REVERT' tiene cambios..."
   echo "7. Pusheando los cambios a la rama '$BRANCH_MASTER'..."
   git push origin $BRANCH_MASTER || { echo "Error: No se pudo pushear los cambios a '$BRANCH_MASTER'."; exit 1; }
   echo "Cambios pusheados exitosamente."
-#fi
+fi
 
 echo "Simulación completada."
