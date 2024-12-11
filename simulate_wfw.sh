@@ -4,7 +4,8 @@
 BRANCH_MASTER="master"
 FILE_TO_REVERT="build.ctl"
 
-echo "Restaurar el archivo a su version original..."
+echo ""
+echo "Restaurar el archivo '$FILE_TO_REVERT' a su version original en la rama '$BRANCH_MASTER' ..."
 echo ""
 
 # 1. Verificar que estamos en el directorio correcto
@@ -61,4 +62,5 @@ else
   echo "  Cambios pusheados exitosamente."
 fi
 
+echo ""
 echo "Simulacion completada."
