@@ -2,7 +2,7 @@
 
 # Configuración inicial
 echo "Restaurar build.ctl con contenido de archivo base si se detectan cambios"
-BRANCH_MASTER="master"
+BRANCH_MASTER="feature/a1"
 FILE_TO_REVERT="build.ctl"
 BASE_FILE="base_build.ctl"
 
