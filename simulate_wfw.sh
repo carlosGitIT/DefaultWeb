@@ -2,7 +2,7 @@
 
 # Configuración inicial
 echo "Restaurar build.ctl con contenido de archivo base si se detectan cambios"
-BRANCH_MASTER="master"
+BRANCH_MASTER="feature/a1"
 FILE_TO_REVERT="build.ctl"
 BASE_FILE="base_build.ctl"
 
@@ -12,6 +12,8 @@ if ! git status &>/dev/null; then
   echo "Error: Este script debe ejecutarse dentro de un repositorio Git."
   exit 1
 fi
+
+BRANCH_MASTER=$(git rev-parse --abbrev-ref HEAD)
 
 # 2. Cambiar a la rama master
 echo "2. Cambiando a la rama '$BRANCH_MASTER'..."
