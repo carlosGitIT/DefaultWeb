@@ -1,4 +1,3 @@
 base del archivo build_original_master
-modificado ...
-
-
+line 1
+line 2
