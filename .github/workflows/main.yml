@@ -32,7 +32,7 @@ jobs:
 
           PREVIOUS_COMMIT=$(git log --format="%H" -n 2 | tail -n 1)
 
-          git checkout PREVIOUS_COMMIT -- build.ctl
+          git checkout $PREVIOUS_COMMIT -- build.ctl
           git add build.ctl
           git commit -m "Restore build.ctl to original master versionafter merge"
           git push origin master
