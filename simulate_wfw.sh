@@ -18,7 +18,7 @@ git checkout $BRANCH_MASTER || { echo "Error: No se pudo cambiar a la rama '$BRA
 
 # 3. Obtener el commit previo al actual en master
 echo "3. Obteniendo el commit anterior en '$BRANCH_MASTER'..."
-PREVIOUS_COMMIT=$(git rev-parse HEAD^)
+PREVIOUS_COMMIT=$(git log --format="%H" -n 2 | tail -n 1)
 if [ -z "$PREVIOUS_COMMIT" ]; then
   echo "Error: No se pudo obtener el commit anterior."
   exit 1
@@ -27,13 +27,10 @@ echo "Commit anterior encontrado: $PREVIOUS_COMMIT"
 
 # 4. Restaurar el archivo build.ctl a su versión del commit anterior
 echo "4. Restaurando el archivo '$FILE_TO_REVERT'..."
-git show "$PREVIOUS_COMMIT:$FILE_TO_REVERT" > $FILE_TO_REVERT || { 
-  echo "Error: No se pudo restaurar el archivo '$FILE_TO_REVERT'.";
-  exit 1;
-}
+git checkout $PREVIOUS_COMMIT -- $FILE_TO_REVERT || { echo "Error: No se pudo restaurar el archivo '$FILE_TO_REVERT'."; exit 1; }
 
-# 5. Verificar si hay cambios
-echo "5. Verificando si el archivo '$FILE_TO_REVERT' tiene cambios..."
+# 5. Verificar si hay diferencias en el área de staging
+echo "5. Verificando si el archivo '$FILE_TO_REVERT' tiene cambios en staging..."
 if git diff --cached --quiet $FILE_TO_REVERT; then
   echo "No se detectaron cambios en '$FILE_TO_REVERT'. No se realizará commit."
 else
