@@ -37,9 +37,9 @@ echo "Commit anterior encontrado: $PREVIOUS_COMMIT"
 echo "5. Restaurando el archivo '$FILE_TO_REVERT'..."
 git checkout $PREVIOUS_COMMIT -- $FILE_TO_REVERT || { echo "Error: No se pudo restaurar el archivo '$FILE_TO_REVERT'."; exit 1; }
 
-# 6. Verificar si realmente hubo cambios en el archivo
+# 6. Verificar si realmente hubo cambios en el archivo restaurado
 echo "6. Verificando si realmente hubo cambios en el archivo restaurado..."
-if ! git diff --cached $FILE_TO_REVERT; then
+if ! git diff --name-only | grep -q "$FILE_TO_REVERT"; then
   echo "No se detectaron cambios en '$FILE_TO_REVERT' después de la restauración. No se realizará commit."
   exit 0
 fi
