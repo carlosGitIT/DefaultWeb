@@ -1,4 +1,4 @@
-name: Preserve build.ctl after PM merge
+name: Revert build.ctl to its previous master version
 
 on:
   pull_request:
@@ -6,29 +6,33 @@ on:
       - closed
 
 jobs:
-  preserve-build-ctl:
+  revert-build-ctl:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+
     steps:
+      #1.- checkout the reposioti with full history
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
+          fetch-depth: 0        #asegura acceso completo al historial
 
       - name: Set up Git identity
         run: |
           git config user.name "github actions"
           git config user.email "actions@github.com"
 
-      - name: fetch master branch
+      #2.- Revert build.ctl to its previous version in master
+      - name: Revert build.ctl to previous master version
         run: |
-          git fetch origin master
+          echo "Finding previous version of build.ctl on master branch"
 
-      - name: Force replacement of build.ctl with master version
-        run: |
-          echo "Restoring build.ctl from master branch"
-          git checkout origin/master -- build.ctl
+          git checkout master
+
+          PREVIOUS_COMMIT=$(git log --format="%H" -n 2 | tail -n 1)
+
+          git checkout PREVIOUS_COMMIT -- build.ctl
           git add build.ctl
           git commit -m "Restore build.ctl to original master versionafter merge"
-          git push origin HEAD:master
+          git push origin master
