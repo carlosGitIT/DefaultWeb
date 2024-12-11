@@ -1,3 +1,3 @@
-borrado o 
-sobre scriptp ´pr el usuario
-
+base del archivo build_original_master
+line 1
+line 2
