@@ -34,7 +34,7 @@ git show "$PREVIOUS_COMMIT:$FILE_TO_REVERT" > $FILE_TO_REVERT || {
 
 # 5. Verificar si hay cambios
 echo "5. Verificando si el archivo '$FILE_TO_REVERT' tiene cambios..."
-if git diff --staged --quiet $FILE_TO_REVERT; then
+if git diff --cached --quiet $FILE_TO_REVERT; then
   echo "No se detectaron cambios en '$FILE_TO_REVERT'. No se realizará commit."
 else
   # 6. Hacer commit de los cambios restaurados
